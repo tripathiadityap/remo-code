@@ -12,7 +12,7 @@ export function RemoLogo({ size = 28, className = "" }: RemoLogoProps) {
       fill="none"
       className={className}
     >
-      <rect width="40" height="40" rx="10" fill="currentColor" />
+      <rect width="40" height="40" rx="10" fill="#14b8a6" />
       <path
         d="M20 10C14.48 10 10 14.48 10 20C10 22.76 11.12 25.26 12.93 27.07L12 30L14.93 29.07C16.74 30.88 19.24 32 22 30C25.52 30 30 25.52 30 20C30 14.48 25.52 10 20 10Z"
         fill="white"
