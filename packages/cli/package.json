@@ -1,0 +1,22 @@
+{
+  "name": "@remo-code/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "remo-code": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@remo-code/adapters": "workspace:*",
+    "@remo-code/sdk": "workspace:*",
+    "commander": "^13.1.0"
+  }
+}

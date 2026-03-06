@@ -1,0 +1,20 @@
+{
+  "name": "remo-code",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Remo-backed context bridge for Codex and Claude",
+  "license": "MIT",
+  "packageManager": "pnpm@10.8.1",
+  "scripts": {
+    "build": "corepack pnpm -r --if-present run build",
+    "dev": "corepack pnpm --filter @remo-code/web dev",
+    "lint": "corepack pnpm --filter @remo-code/sdk --filter @remo-code/adapters build && corepack pnpm -r --if-present run lint",
+    "test": "corepack pnpm -r --if-present run test",
+    "typecheck": "corepack pnpm --filter @remo-code/sdk --filter @remo-code/adapters build && corepack pnpm -r --if-present run typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
