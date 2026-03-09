@@ -1,11 +1,29 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutDashboard, Package, Copy, Download } from "lucide-react";
+import { Copy, Download, LayoutDashboard, Package } from "lucide-react";
 import { formatForClaude, formatForCodex } from "@remo-code/adapters";
 import { useWorkspace } from "../layout";
 
 type TabKey = "codex" | "claude" | "raw";
+
+const tabMeta: Record<TabKey, { label: string; filename: string; description: string }> = {
+  codex: {
+    label: "Codex",
+    filename: "remo-pack-codex.md",
+    description: "Markdown pack tuned for Codex consumption and task execution.",
+  },
+  claude: {
+    label: "Claude",
+    filename: "remo-pack-claude.md",
+    description: "Readable prompt pack with Claude-friendly structure and prose.",
+  },
+  raw: {
+    label: "Raw JSON",
+    filename: "remo-pack-raw.json",
+    description: "Full serialized context payload for custom tooling or debugging.",
+  },
+};
 
 export default function PacksPage() {
   const ws = useWorkspace();
@@ -25,6 +43,12 @@ export default function PacksPage() {
   );
 
   const tabContent = activeTab === "codex" ? codexPack : activeTab === "claude" ? claudePack : rawJson;
+  const activeMeta = tabMeta[activeTab];
+
+  const typeCount = useMemo(
+    () => new Set(ws.fullContexts.map((context) => context.type)).size,
+    [ws.fullContexts],
+  );
 
   const copyContent = () => {
     if (!tabContent) return;
@@ -44,12 +68,6 @@ export default function PacksPage() {
     URL.revokeObjectURL(url);
     ws.showToast(`Downloaded remo-pack-${activeTab}.${ext}`);
   };
-
-  const tabs: { key: TabKey; label: string }[] = [
-    { key: "codex", label: "Codex" },
-    { key: "claude", label: "Claude" },
-    { key: "raw", label: "Raw JSON" },
-  ];
 
   return (
     <>
@@ -85,49 +103,82 @@ export default function PacksPage() {
             </p>
           </div>
         ) : (
-          <div className="animate-in">
-            {/* ── Tab bar ── */}
-            <div className="flex items-center justify-between mb-lg">
-              <div className="tab-bar">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    className={`tab-item ${activeTab === tab.key ? "active" : ""}`}
-                    onClick={() => setActiveTab(tab.key)}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+          <div className="workspace-stack animate-in">
+            <div className="metric-strip">
+              <div className="metric-chip">
+                <strong>{ws.fullContexts.length}</strong>
+                <span>contexts</span>
               </div>
-              <div className="flex items-center gap-sm">
-                <span className="badge badge-default">
-                  {tabContent.length.toLocaleString()} chars
-                </span>
-                <span className="badge badge-default">
-                  {ws.fullContexts.length} contexts
-                </span>
+              <div className="metric-chip">
+                <strong>{typeCount}</strong>
+                <span>types</span>
+              </div>
+              <div className="metric-chip">
+                <strong>{tabContent.length.toLocaleString()}</strong>
+                <span>characters</span>
               </div>
             </div>
 
-            {/* ── Terminal output ── */}
-            <div className="terminal">
-              <div className="terminal-header">
-                <div className="terminal-dots">
-                  <span className="terminal-dot red" />
-                  <span className="terminal-dot yellow" />
-                  <span className="terminal-dot green" />
+            <div className="pack-layout">
+              <div className="card pack-side-panel">
+                <div className="card-header">
+                  <span className="card-title">
+                    <span className="card-icon">
+                      <Package size={16} strokeWidth={1.5} />
+                    </span>
+                    Output Format
+                  </span>
                 </div>
-                <span className="terminal-title">
-                  remo-pack-{activeTab}.{activeTab === "raw" ? "json" : "md"}
-                </span>
-                <div className="terminal-actions">
-                  <button className="btn btn-ghost btn-sm" onClick={copyContent}>
-                    Copy
-                  </button>
+
+                <div className="tab-bar">
+                  {Object.entries(tabMeta).map(([key, meta]) => (
+                    <button
+                      key={key}
+                      className={`tab-item ${activeTab === key ? "active" : ""}`}
+                      onClick={() => setActiveTab(key as TabKey)}
+                    >
+                      {meta.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="callout-card mt-md">
+                  <strong>{activeMeta.filename}</strong>
+                  <p>{activeMeta.description}</p>
+                </div>
+
+                <div className="workspace-list mt-md">
+                  {ws.fullContexts.slice(0, 6).map((context) => (
+                    <div key={context.id} className="context-card">
+                      <div className="flex items-center justify-between">
+                        <span className="context-card-title">{context.title}</span>
+                        <span className="badge badge-default">{context.type}</span>
+                      </div>
+                      <div className="context-card-meta">
+                        <span>{context.id}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="terminal-body" style={{ maxHeight: 600 }}>
-                <pre>{tabContent || "Empty pack."}</pre>
+
+              <div className="terminal">
+                <div className="terminal-header">
+                  <div className="terminal-dots">
+                    <span className="terminal-dot red" />
+                    <span className="terminal-dot yellow" />
+                    <span className="terminal-dot green" />
+                  </div>
+                  <span className="terminal-title">{activeMeta.filename}</span>
+                  <div className="terminal-actions">
+                    <button className="btn btn-ghost btn-sm" onClick={copyContent}>
+                      Copy
+                    </button>
+                  </div>
+                </div>
+                <div className="terminal-body" style={{ maxHeight: 720 }}>
+                  <pre>{tabContent || "Empty pack."}</pre>
+                </div>
               </div>
             </div>
           </div>

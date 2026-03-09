@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  LayoutDashboard,
-  Sparkles,
-  RefreshCw,
-  Copy,
-} from "lucide-react";
+import { Copy, LayoutDashboard, RefreshCw, Sparkles } from "lucide-react";
 import { useWorkspace } from "../layout";
 
 export default function PromptPage() {
@@ -16,6 +11,8 @@ export default function PromptPage() {
     navigator.clipboard.writeText(ws.prompt);
     ws.showToast("Prompt copied");
   };
+
+  const lineCount = ws.prompt ? ws.prompt.split("\n").length : 0;
 
   return (
     <>
@@ -70,8 +67,8 @@ export default function PromptPage() {
                 margin: "0 auto 1.5rem",
               }}
             >
-              Generate a system prompt from your REMO contexts to inject into
-              Codex or Claude sessions.
+              Generate a system prompt from your REMO contexts to inject into Codex or Claude
+              sessions.
             </p>
             <button
               className="btn btn-primary"
@@ -91,11 +88,53 @@ export default function PromptPage() {
             </button>
           </div>
         ) : (
-          <div className="animate-in">
-            <div className="flex items-center justify-between mb-md">
-              <span className="badge badge-default">
-                {ws.prompt.length.toLocaleString()} characters
-              </span>
+          <div className="workspace-split animate-in">
+            <div className="card pack-side-panel">
+              <div className="card-header">
+                <span className="card-title">
+                  <span className="card-icon">
+                    <Sparkles size={16} strokeWidth={1.5} />
+                  </span>
+                  Prompt Brief
+                </span>
+              </div>
+
+              <div className="metric-strip">
+                <div className="metric-chip">
+                  <strong>{ws.prompt.length.toLocaleString()}</strong>
+                  <span>characters</span>
+                </div>
+                <div className="metric-chip">
+                  <strong>{lineCount}</strong>
+                  <span>lines</span>
+                </div>
+              </div>
+
+              <div className="callout-card mt-md">
+                <strong>Use this as your session bootstrap.</strong>
+                <p>
+                  Paste it into Codex or Claude before implementation work so the agent starts with
+                  product goals, architecture, and memory instead of reconstructing them from scratch.
+                </p>
+              </div>
+
+              <div className="workspace-list mt-md">
+                <div className="context-card">
+                  <div className="context-card-title">Suggested usage</div>
+                  <div className="context-card-meta">
+                    <span>1. Generate prompt</span>
+                    <span>2. Attach pack</span>
+                    <span>3. Start task</span>
+                  </div>
+                </div>
+                <div className="context-card">
+                  <div className="context-card-title">Source</div>
+                  <div className="context-card-meta">
+                    <span>{ws.contexts.length} loaded contexts</span>
+                    <span>{ws.connected ? "REMO connected" : "offline"}</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="terminal">
@@ -113,7 +152,7 @@ export default function PromptPage() {
                   </button>
                 </div>
               </div>
-              <div className="terminal-body" style={{ maxHeight: 700 }}>
+              <div className="terminal-body" style={{ maxHeight: 720 }}>
                 <pre>{ws.prompt}</pre>
               </div>
             </div>

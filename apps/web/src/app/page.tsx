@@ -1,38 +1,101 @@
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight,
-  Code,
-  Zap,
-  Terminal,
+  BookOpen,
+  Brain,
+  Boxes,
+  ExternalLink,
+  Github,
   LayoutDashboard,
   Shield,
-  GitBranch,
-  Brain,
-  Github,
-  ExternalLink,
-  BookOpen,
+  Sparkles,
+  Terminal,
+  Workflow,
 } from "lucide-react";
 import { RemoLogo } from "../components/icons/remo-logo";
+
+const productStats = [
+  { value: "CLI + SDK", label: "typed bridge across terminal, web, and adapters" },
+  { value: "Codex + Claude", label: "build packs for the agents your team already uses" },
+  { value: "Live REMO API", label: "persistent context instead of session-by-session resets" },
+];
+
+const featureCards: Array<{
+  title: string;
+  copy: string;
+  icon: LucideIcon;
+  tone: string;
+}> = [
+  {
+    title: "Sharper Workspace Shell",
+    copy: "T3-inspired density, quieter chrome, and product-grade surface treatment for the REMO dashboard.",
+    icon: LayoutDashboard,
+    tone: "blue",
+  },
+  {
+    title: "Fast Pack Building",
+    copy: "Generate Codex and Claude-ready context packs from the same stored knowledge base without extra glue code.",
+    icon: Boxes,
+    tone: "green",
+  },
+  {
+    title: "Prompt Generation",
+    copy: "Turn stored contexts into reusable system prompts for new sessions and repeatable workflows.",
+    icon: Sparkles,
+    tone: "purple",
+  },
+  {
+    title: "Terminal-Native Flow",
+    copy: "Keep the product grounded in the CLI path that developers actually use, not just a marketing UI.",
+    icon: Terminal,
+    tone: "orange",
+  },
+  {
+    title: "Protected By Design",
+    copy: "Local key storage, typed API boundaries, and a calmer interface that keeps the important state obvious.",
+    icon: Shield,
+    tone: "green",
+  },
+  {
+    title: "Workflow Memory",
+    copy: "Feed architecture, specs, notes, and code snippets back into the exact execution layer doing the work.",
+    icon: Brain,
+    tone: "blue",
+  },
+];
+
+const workflowSteps = [
+  {
+    step: "01",
+    title: "Connect your REMO account",
+    copy: "Store the API key once, point the app at `remo.rocks`, and pull down the project contexts you care about.",
+  },
+  {
+    step: "02",
+    title: "Build agent-specific context",
+    copy: "Filter, inspect, and package the same context corpus for Codex, Claude, or raw JSON handoff.",
+  },
+  {
+    step: "03",
+    title: "Launch higher-context sessions",
+    copy: "Use prompt generation and pack export to start sessions from architecture, goals, and prior decisions.",
+  },
+];
+
+const previewTypes = ["architecture", "spec", "note", "snippet"];
+const previewNav = ["Workspace", "Contexts", "Pack Builder", "Prompt Gen"];
 
 export default function HomePage() {
   return (
     <div className="landing">
-      {/* ── Nav ── */}
       <nav className="landing-nav">
         <Link href="/" className="landing-nav-logo">
           <RemoLogo size={26} />
           REMO Code
         </Link>
+
         <div className="landing-nav-links">
-          <a
-            href="https://remo.rocks"
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-ghost btn-sm"
-          >
-            <ExternalLink size={14} strokeWidth={1.5} />
-            remo.rocks
-          </a>
           <Link href="/docs" className="btn btn-ghost btn-sm">
             <BookOpen size={14} strokeWidth={1.5} />
             Docs
@@ -53,211 +116,225 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* ── Hero ── */}
-      <section className="landing-hero">
-        <div className="hero-badge animate-in">
-          <Zap size={14} />
-          Open Source Context Bridge
-        </div>
+      <main className="landing-main">
+        <section className="landing-hero">
+          <div className="hero-badge animate-in">
+            <Workflow size={14} strokeWidth={1.6} />
+            Open-source memory layer for coding agents
+          </div>
 
-        <h1 className="hero-title animate-in animate-in-delay-1">
-          Persistent memory for{" "}
-          <span className="gradient-text">AI coding agents</span>
-        </h1>
+          <h1 className="hero-title animate-in animate-in-delay-1">
+            Persistent context for
+            {" "}
+            <span className="gradient-text">faster AI coding workflows</span>
+          </h1>
 
-        <p className="hero-subtitle animate-in animate-in-delay-2">
-          Give Codex and Claude long-term context about your codebase,
-          architecture, and goals. Stop re-explaining everything every session.
-        </p>
+          <p className="hero-subtitle animate-in animate-in-delay-2">
+            REMO Code keeps the product surface and CLI grounded in the same context source, then
+            packages that memory for Codex, Claude, and repeatable agent runs.
+          </p>
 
-        <div className="hero-actions animate-in animate-in-delay-3">
-          <Link href="/workspace" className="btn btn-primary">
-            Launch Workspace
-            <ArrowRight size={16} />
-          </Link>
-          <a
-            href="https://remo.rocks"
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-secondary"
-          >
-            Get API Key
-            <ExternalLink size={14} />
-          </a>
-        </div>
+          <div className="hero-actions animate-in animate-in-delay-2">
+            <Link href="/workspace" className="btn btn-primary">
+              Launch Workspace
+              <ArrowRight size={16} />
+            </Link>
+            <a
+              href="https://remo.rocks"
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-secondary"
+            >
+              Get API Key
+              <ExternalLink size={14} />
+            </a>
+          </div>
 
-        {/* ── Hero terminal ── */}
-        <div className="hero-terminal animate-in animate-in-delay-3">
-          <div className="terminal">
-            <div className="terminal-header">
-              <div className="terminal-dots">
-                <span className="terminal-dot red" />
-                <span className="terminal-dot yellow" />
-                <span className="terminal-dot green" />
+          <div className="hero-stat-row animate-in animate-in-delay-3">
+            {productStats.map((stat) => (
+              <div key={stat.value} className="hero-stat">
+                <span className="hero-stat-value">{stat.value}</span>
+                <span className="hero-stat-label">{stat.label}</span>
               </div>
-              <span className="terminal-title">Terminal</span>
-              <span />
-            </div>
-            <div className="terminal-body">
-              <pre>
-                <span className="cmd-comment"># Install remo-code CLI</span>
-                {"\n"}
-                <span className="cmd-prefix">$ </span>
-                <span className="cmd-text">pnpm install &amp;&amp; pnpm build</span>
-                {"\n\n"}
-                <span className="cmd-comment"># Authenticate with REMO</span>
-                {"\n"}
-                <span className="cmd-prefix">$ </span>
-                <span className="cmd-text">remo-code auth set-key remo_your_key</span>
-                {"\n"}
-                <span className="cmd-output">&#10003; API key saved to ~/.remo-code/config.json</span>
-                {"\n\n"}
-                <span className="cmd-comment"># Build context pack for Codex</span>
-                {"\n"}
-                <span className="cmd-prefix">$ </span>
-                <span className="cmd-text">remo-code pack build --for codex</span>
-                {"\n"}
-                <span className="cmd-output">&#10003; Packed 8 contexts (4,212 chars) &mdash; codex style</span>
-                {"\n\n"}
-                <span className="cmd-comment"># Run Codex with full context</span>
-                {"\n"}
-                <span className="cmd-prefix">$ </span>
-                <span className="cmd-text">
-                  remo-code run codex &quot;Refactor the auth flow&quot;
-                </span>
-                {"\n"}
-                <span className="cmd-output">
-                  &gt; Launching codex with REMO context...
-                </span>
-              </pre>
+            ))}
+          </div>
+
+          <div className="hero-preview animate-in animate-in-delay-3">
+            <div className="preview-window">
+              <div className="preview-toolbar">
+                <div className="terminal-dots">
+                  <span className="terminal-dot red" />
+                  <span className="terminal-dot yellow" />
+                  <span className="terminal-dot green" />
+                </div>
+                <span className="preview-toolbar-title">workspace.remo-code</span>
+                <span className="preview-toolbar-badge">Codex pack ready</span>
+              </div>
+
+              <div className="preview-layout">
+                <aside className="preview-rail">
+                  <div className="preview-brand">
+                    <RemoLogo size={22} />
+                    <div>
+                      <strong>REMO Code</strong>
+                      <span>persistent memory shell</span>
+                    </div>
+                  </div>
+
+                  <div className="preview-rail-card">
+                    <span className="preview-rail-label">Connection</span>
+                    <strong>remo.rocks / live</strong>
+                    <span className="preview-rail-meta">12 cached contexts, 4 collections</span>
+                  </div>
+
+                  <div className="preview-nav-list">
+                    {previewNav.map((item, index) => (
+                      <div
+                        key={item}
+                        className={`preview-nav-item ${index === 0 ? "active" : ""}`}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </aside>
+
+                <div className="preview-main">
+                  <div className="preview-command">
+                    <span className="cmd-prefix">$</span>
+                    <span className="cmd-text">
+                      remo-code pack build --for codex --max-chars 12000
+                    </span>
+                  </div>
+
+                  <div className="preview-grid">
+                    <article className="preview-panel">
+                      <div className="preview-panel-header">
+                        <span>Context Sources</span>
+                        <span>8 loaded</span>
+                      </div>
+
+                      <div className="preview-chip-list">
+                        {previewTypes.map((type) => (
+                          <span key={type} className="preview-chip">
+                            {type}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="preview-list">
+                        <div className="preview-list-row">
+                          <strong>Auth architecture</strong>
+                          <span>active</span>
+                        </div>
+                        <div className="preview-list-row">
+                          <strong>Workspace conventions</strong>
+                          <span>updated 2h ago</span>
+                        </div>
+                        <div className="preview-list-row">
+                          <strong>Prompt snippets</strong>
+                          <span>3 reusable blocks</span>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article className="preview-panel">
+                      <div className="preview-panel-header">
+                        <span>Prompt Output</span>
+                        <span>live</span>
+                      </div>
+                      <pre className="preview-code">{`You are working inside a typed monorepo.
+Use stored architecture notes before changing auth,
+workspace, or context-pack generation flows.`}</pre>
+                    </article>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── Features ── */}
-      <section className="landing-features">
-        <h2 className="features-title">Built for developer workflows</h2>
-        <p className="features-subtitle">
-          Everything you need to give AI agents persistent, structured context.
-        </p>
-
-        <div className="grid grid-3" style={{ gap: "1.25rem" }}>
-          <div className="feature-card">
-            <div className="feature-icon purple">
-              <Code size={22} strokeWidth={1.5} />
-            </div>
-            <h3>Context SDK</h3>
+        <section className="landing-section">
+          <div className="section-heading">
+            <span className="section-kicker">Integrated Direction</span>
+            <h2>Sharper product surfaces without changing the REMO core</h2>
             <p>
-              TypeScript SDK with typed errors, rate-limit handling, and
-              full CRUD for your REMO contexts.
+              The app now leans into the cleaner T3 Code visual language while keeping the actual
+              product centered on REMO context retrieval, prompt generation, and pack export.
             </p>
           </div>
 
-          <div className="feature-card">
-            <div className="feature-icon green">
-              <Zap size={22} strokeWidth={1.5} />
-            </div>
-            <h3>Agent Adapters</h3>
+          <div className="grid grid-3">
+            {featureCards.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <article key={feature.title} className="feature-card">
+                  <div className={`feature-icon ${feature.tone}`}>
+                    <Icon size={20} strokeWidth={1.7} />
+                  </div>
+                  <h3>{feature.title}</h3>
+                  <p>{feature.copy}</p>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="landing-section">
+          <div className="section-heading">
+            <span className="section-kicker">Workflow</span>
+            <h2>Use the same memory source across UI and terminal</h2>
             <p>
-              Format context packs optimized for Codex, Claude, or any
-              generic LLM with a single function call.
+              This stays practical: connect REMO, inspect context, export packs, then launch the
+              agent flow you already use.
             </p>
           </div>
 
-          <div className="feature-card">
-            <div className="feature-icon blue">
-              <Terminal size={22} strokeWidth={1.5} />
-            </div>
-            <h3>Powerful CLI</h3>
-            <p>
-              Full command-line interface for auth, context management,
-              prompt generation, and wrapped agent execution.
-            </p>
+          <div className="grid grid-3">
+            {workflowSteps.map((item) => (
+              <article key={item.step} className="workflow-card">
+                <span className="workflow-step">{item.step}</span>
+                <h3>{item.title}</h3>
+                <p>{item.copy}</p>
+              </article>
+            ))}
           </div>
+        </section>
 
-          <div className="feature-card">
-            <div className="feature-icon orange">
-              <LayoutDashboard size={22} strokeWidth={1.5} />
-            </div>
-            <h3>Web Workspace</h3>
+        <section className="landing-cta">
+          <div className="landing-cta-inner">
+            <Brain size={36} strokeWidth={1.5} />
+            <h2>Give your agents a memory layer, not another blank session</h2>
             <p>
-              Visual dashboard to browse contexts, generate prompts, and
-              preview context packs in real time.
+              Open the workspace, connect your key, and start generating packs and prompts from the
+              contexts you already keep in REMO.
             </p>
-          </div>
-
-          <div className="feature-card">
-            <div className="feature-icon purple">
-              <Shield size={22} strokeWidth={1.5} />
+            <div className="hero-actions">
+              <Link href="/workspace" className="btn btn-primary">
+                Open Workspace
+                <ArrowRight size={16} />
+              </Link>
+              <Link href="/docs" className="btn btn-secondary">
+                Read Docs
+              </Link>
             </div>
-            <h3>Secure by Default</h3>
-            <p>
-              API keys stored locally, rate-limit aware, with typed errors
-              and zero dependencies in the SDK.
-            </p>
           </div>
+        </section>
+      </main>
 
-          <div className="feature-card">
-            <div className="feature-icon green">
-              <GitBranch size={22} strokeWidth={1.5} />
-            </div>
-            <h3>Open Source</h3>
-            <p>
-              MIT licensed, monorepo architecture, fully typed TypeScript
-              from CLI to web. Built to extend.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="landing-cta">
-        <div style={{ marginBottom: "1.25rem" }}>
-          <Brain size={40} strokeWidth={1.5} style={{ color: "var(--accent)", opacity: 0.7 }} />
-        </div>
-        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.5rem" }}>
-          Ready to give your agents memory?
-        </h2>
-        <p
-          style={{
-            color: "var(--text-secondary)",
-            marginBottom: "1.5rem",
-            fontSize: "0.95rem",
-          }}
-        >
-          Get started in under two minutes with a free REMO API key.
-        </p>
-        <div className="flex items-center" style={{ justifyContent: "center", gap: "0.75rem" }}>
-          <Link href="/workspace" className="btn btn-primary">
-            Open Workspace
-            <ArrowRight size={16} />
-          </Link>
-          <a
-            href="https://remo.rocks"
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-secondary"
-          >
-            Create Account
+      <footer className="landing-footer">
+        <span>REMO Code • open source context bridge</span>
+        <div className="landing-footer-links">
+          <a href="https://remo.rocks" target="_blank" rel="noreferrer">
+            REMO
+          </a>
+          <a href="https://github.com/pingdotgg/t3code" target="_blank" rel="noreferrer">
+            T3 Code reference
+          </a>
+          <a href="https://github.com/tripathiadityap/remo-code" target="_blank" rel="noreferrer">
+            GitHub
           </a>
         </div>
-      </section>
-
-      {/* ── Footer ── */}
-      <footer className="landing-footer">
-        REMO Code &middot; Open Source &middot; Powered by{" "}
-        <a href="https://remo.rocks" target="_blank" rel="noreferrer">
-          REMO
-        </a>{" "}
-        &middot;{" "}
-        <a
-          href="https://github.com/tripathiadityap/remo-code"
-          target="_blank"
-          rel="noreferrer"
-        >
-          GitHub
-        </a>
       </footer>
     </div>
   );

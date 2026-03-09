@@ -1,27 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
+  Copy,
   LayoutDashboard,
   Layers,
-  ChevronDown,
-  ChevronRight,
-  Copy,
+  Search,
 } from "lucide-react";
 import { useWorkspace } from "../layout";
 
 export default function ContextsPage() {
   const ws = useWorkspace();
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState("");
+  const [search, setSearch] = useState("");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const types = Array.from(new Set(ws.contexts.map((c) => c.type)));
-  const filtered = filterType
-    ? ws.contexts.filter((c) => c.type === filterType)
-    : ws.contexts;
+  const types = useMemo(
+    () => Array.from(new Set(ws.contexts.map((context) => context.type))).sort(),
+    [ws.contexts],
+  );
 
-  const getFullContent = (id: string) =>
-    ws.fullContexts.find((c) => c.id === id)?.content ?? "";
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return ws.contexts.filter((context) => {
+      const matchesType = !filterType || context.type === filterType;
+      const matchesQuery =
+        !query ||
+        context.title.toLowerCase().includes(query) ||
+        context.id.toLowerCase().includes(query) ||
+        (context.collection ?? "").toLowerCase().includes(query);
+      return matchesType && matchesQuery;
+    });
+  }, [filterType, search, ws.contexts]);
+
+  const resolvedSelectedId = useMemo(() => {
+    if (selectedId && filtered.some((context) => context.id === selectedId)) {
+      return selectedId;
+    }
+    return filtered[0]?.id ?? null;
+  }, [filtered, selectedId]);
+
+  const selectedContext = useMemo(
+    () => ws.fullContexts.find((context) => context.id === resolvedSelectedId) ?? null,
+    [resolvedSelectedId, ws.fullContexts],
+  );
+
+  const copySelectedContent = () => {
+    if (!selectedContext?.content) return;
+    navigator.clipboard.writeText(selectedContext.content);
+    ws.showToast("Content copied");
+  };
 
   return (
     <>
@@ -35,7 +63,10 @@ export default function ContextsPage() {
         </div>
         <div className="content-header-actions">
           <span className="badge badge-default">
-            {filtered.length} context{filtered.length !== 1 ? "s" : ""}
+            {filtered.length} shown
+          </span>
+          <span className="badge badge-default">
+            {ws.contexts.length} total
           </span>
         </div>
       </div>
@@ -52,97 +83,139 @@ export default function ContextsPage() {
             </p>
           </div>
         ) : (
-          <>
-            <div className="flex items-center gap-sm mb-lg animate-in">
-              <button
-                className={`btn btn-sm ${!filterType ? "btn-primary" : "btn-ghost"}`}
-                onClick={() => setFilterType("")}
-              >
-                All
-              </button>
-              {types.map((t) => (
-                <button
-                  key={t}
-                  className={`btn btn-sm ${filterType === t ? "btn-primary" : "btn-ghost"}`}
-                  onClick={() => setFilterType(t)}
-                >
-                  {t}
-                </button>
-              ))}
+          <div className="workspace-stack">
+            <div className="card animate-in">
+              <div className="card-header">
+                <span className="card-title">
+                  <span className="card-icon">
+                    <Search size={16} strokeWidth={1.5} />
+                  </span>
+                  Filter Contexts
+                </span>
+              </div>
+
+              <div className="workspace-filter-bar">
+                <div className="input-group workspace-search">
+                  <label className="input-label">Search</label>
+                  <input
+                    className="input"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search by title, id, or collection"
+                  />
+                </div>
+
+                <div className="workspace-chip-row">
+                  <button
+                    className={`btn btn-sm ${!filterType ? "btn-primary" : "btn-ghost"}`}
+                    onClick={() => setFilterType("")}
+                  >
+                    All
+                  </button>
+                  {types.map((type) => (
+                    <button
+                      key={type}
+                      className={`btn btn-sm ${filterType === type ? "btn-primary" : "btn-ghost"}`}
+                      onClick={() => setFilterType(type)}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-sm animate-in animate-in-delay-1">
-              {filtered.map((ctx) => {
-                const isExpanded = expandedId === ctx.id;
-                return (
-                  <div
-                    key={ctx.id}
-                    className="card"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => setExpandedId(isExpanded ? null : ctx.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-sm">
-                        <span style={{ color: "var(--text-dim)" }}>
-                          {isExpanded
-                            ? <ChevronDown size={16} strokeWidth={1.5} />
-                            : <ChevronRight size={16} strokeWidth={1.5} />}
-                        </span>
-                        <span style={{ fontWeight: 600 }}>{ctx.title}</span>
+            <div className="workspace-split animate-in animate-in-delay-1">
+              <div className="card">
+                <div className="card-header">
+                  <span className="card-title">
+                    <span className="card-icon">
+                      <Layers size={16} strokeWidth={1.5} />
+                    </span>
+                    Context Index
+                  </span>
+                </div>
+
+                <div className="workspace-list workspace-scroll">
+                  {filtered.map((context) => (
+                    <button
+                      key={context.id}
+                      className={`context-list-item ${resolvedSelectedId === context.id ? "active" : ""}`}
+                      onClick={() => setSelectedId(context.id)}
+                      type="button"
+                    >
+                      <div className="flex items-center justify-between gap-sm">
+                        <span className="context-card-title">{context.title}</span>
+                        <span className={`badge ${getBadgeClass(context.type)}`}>{context.type}</span>
                       </div>
-                      <div className="flex items-center gap-sm">
-                        {ctx.collection && (
-                          <span className="badge badge-default">{ctx.collection}</span>
-                        )}
-                        <span className={`badge ${getBadgeClass(ctx.type)}`}>
-                          {ctx.type}
-                        </span>
+                      <div className="context-card-meta">
+                        <span>{context.id}</span>
+                        {context.collection ? <span>{context.collection}</span> : null}
                       </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="card inspector-panel">
+                {selectedContext ? (
+                  <>
+                    <div className="card-header">
+                      <span className="card-title">
+                        <span className="card-icon">
+                          <Layers size={16} strokeWidth={1.5} />
+                        </span>
+                        {selectedContext.title}
+                      </span>
+                      <button className="btn btn-ghost btn-sm" onClick={copySelectedContent}>
+                        <Copy size={14} strokeWidth={1.5} />
+                        Copy
+                      </button>
                     </div>
 
-                    <div className="context-card-meta mt-sm">
-                      <span>ID: {ctx.id}</span>
-                      {ctx.createdAt && (
-                        <>
-                          <span style={{ color: "var(--text-dim)" }}>&middot;</span>
-                          <span>{new Date(ctx.createdAt).toLocaleDateString()}</span>
-                        </>
+                    <div className="inspector-meta">
+                      <span className={`badge ${getBadgeClass(selectedContext.type)}`}>
+                        {selectedContext.type}
+                      </span>
+                      {selectedContext.collection ? (
+                        <span className="badge badge-default">{selectedContext.collection}</span>
+                      ) : null}
+                      {selectedContext.isActive ? (
+                        <span className="badge badge-green">active</span>
+                      ) : (
+                        <span className="badge badge-default">inactive</span>
                       )}
                     </div>
 
-                    {isExpanded && (
-                      <div className="mt-md">
-                        <div className="terminal">
-                          <div className="terminal-header">
-                            <div className="terminal-dots">
-                              <span className="terminal-dot red" />
-                              <span className="terminal-dot yellow" />
-                              <span className="terminal-dot green" />
-                            </div>
-                            <span className="terminal-title">{ctx.title}</span>
-                            <button
-                              className="btn btn-ghost btn-sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigator.clipboard.writeText(getFullContent(ctx.id));
-                                ws.showToast("Content copied");
-                              }}
-                            >
-                              <Copy size={14} strokeWidth={1.5} />
-                              Copy
-                            </button>
-                          </div>
-                          <div className="terminal-body">
-                            <pre>{getFullContent(ctx.id) || "No content available."}</pre>
-                          </div>
+                    <div className="terminal">
+                      <div className="terminal-header">
+                        <div className="terminal-dots">
+                          <span className="terminal-dot red" />
+                          <span className="terminal-dot yellow" />
+                          <span className="terminal-dot green" />
                         </div>
+                        <span className="terminal-title">{selectedContext.id}</span>
+                        <span className="badge badge-default">
+                          {(selectedContext.content ?? "").length.toLocaleString()} chars
+                        </span>
                       </div>
-                    )}
+                      <div className="terminal-body" style={{ maxHeight: 720 }}>
+                        <pre>{selectedContext.content || "No content available."}</pre>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="empty-state">
+                    <div className="empty-state-icon">
+                      <Layers size={32} strokeWidth={1} />
+                    </div>
+                    <p className="empty-state-text">No matching context</p>
+                    <p className="empty-state-hint">Adjust your filters or clear the search query.</p>
                   </div>
-                );
-              })}
+                )}
+              </div>
             </div>
-          </>
+          </div>
         )}
       </div>
     </>

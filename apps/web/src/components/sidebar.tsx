@@ -34,9 +34,21 @@ export function Sidebar({ contextCount = 0, connected = false }: SidebarProps) {
           <span className="logo-icon">
             <RemoLogo size={28} />
           </span>
-          REMO Code
+          <span className="sidebar-brand">
+            <span className="sidebar-brand-title">REMO Code</span>
+            <span className="sidebar-brand-subtitle">persistent memory shell</span>
+          </span>
         </Link>
-        <span className="sidebar-version">v0.1.0</span>
+        <span className="sidebar-version">web</span>
+      </div>
+
+      <div className="sidebar-meta">
+        <span className={`status-pill ${connected ? "online" : "offline"}`}>
+          {connected ? "Live REMO" : "Offline"}
+        </span>
+        <span className="sidebar-meta-copy">
+          {contextCount > 0 ? `${contextCount} contexts cached` : "Load contexts to begin"}
+        </span>
       </div>
 
       <nav className="sidebar-nav">
